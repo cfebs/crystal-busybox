@@ -1,9 +1,10 @@
 require "option_parser"
-
-version = "0.1.0"
-
 require "./commands/*"
 
+# TODO
+# - building instance of every command just to parse the opts
+
+version = "0.1.0"
 active_cmd = nil
 
 opt_parser = OptionParser.new do |parser|
