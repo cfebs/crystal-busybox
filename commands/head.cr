@@ -79,11 +79,10 @@ class HeadCommand
         file = File.new(fname)
         file.each_byte do |b|
           byte_num += 1
-          print String.new(Slice.new(1, b))
-
           if byte_num > num_bytes
             break
           end
+          print String.new(Slice.new(1, b))
         end
 
         return
@@ -92,11 +91,11 @@ class HeadCommand
       line_num = 0
       File.each_line(fname) do |line|
         line_num += 1
-        STDOUT.puts line
-
         if line_num > @options.num_lines
           break
         end
+
+        puts line
       end
     end
   end
