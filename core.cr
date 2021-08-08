@@ -2,24 +2,23 @@ require "option_parser"
 
 version = "0.1.0"
 
-require "./commands/ls"
-require "./commands/head"
+require "./commands/*"
 
 active_cmd = nil
 
-parser = OptionParser.new do |parser|
+opt_parser = OptionParser.new do |parser|
   parser.banner = "crystal-busybox"
 
   commands = [
-      LsCommand.new,
-      HeadCommand.new,
+    LsCommand.new,
+    HeadCommand.new,
   ]
 
   commands.each do |cmd|
-      active = cmd.setup_parser(parser)
-      if active
-          active_cmd = cmd
-      end
+    active = cmd.setup_parser(parser)
+    if active
+      active_cmd = cmd
+    end
   end
 
   parser.on "-v", "--version", "Show version" do
@@ -33,8 +32,8 @@ parser = OptionParser.new do |parser|
   end
 end
 
-parser.parse
+opt_parser.parse
 
 if active_cmd
-    active_cmd.run()
+  active_cmd.run
 end
