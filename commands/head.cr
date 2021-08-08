@@ -1,16 +1,14 @@
-# TODO
-# - spacing between files when headers are on
-# - buffered byte reading, just using each_byte now
-#   - print statement flushes every byte
+require "./base_command"
+# TODO spacing between files when headers are on
+# TODO buffered byte reading, just using each_byte now. print statement flushes every byte
 
 private class Opts
-  property files, num_lines, use_bytes, num_bytes, verbose, quiet
+  property files, num_lines, num_bytes, verbose, quiet
 
   def initialize(
     @files : Array(String) = [] of String,
     @num_lines : Int32 = 10,
-    @use_bytes : Bool = false,
-    @num_bytes : Int32 = 0,
+    @num_bytes : Int32? = 0,
     @verbose : Bool = false,
     @quiet : Bool = false
   )
@@ -18,15 +16,19 @@ private class Opts
 end
 
 class HeadCommand
+  include BaseCommand
+
   @@name = "head"
 
   # setup_parser
   def initialize
     @options = Opts.new
+    @active = false
   end
 
-  def setup_parser(parser : OptionParser)
+  def setup_parser(parser : OptionParser) Bool
     parser.on(@@name, "output the first part of files") do
+      @active = true
       parser.on("-n", "--lines=NUM", "print  the  first  NUM lines instead of the first 10; with the leading '-', print all but the last NUM lines of each file") do |num|
         @options.num_lines = num.to_i
       end
@@ -36,7 +38,6 @@ class HeadCommand
         if num_i == nil
           raise "Invalid bytes number"
         end
-        @options.use_bytes = true
         @options.num_bytes = num.to_i
       end
 
@@ -72,13 +73,15 @@ class HeadCommand
         next
       end
 
-      if @options.use_bytes
+      num_bytes = @options.num_bytes
+      if !num_bytes.nil?
         byte_num = 0
         file = File.new(fname)
         file.each_byte do |b|
           byte_num += 1
           print String.new(Slice.new(1, b))
-          if byte_num > @options.num_bytes
+
+          if byte_num > num_bytes
             break
           end
         end

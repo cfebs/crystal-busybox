@@ -5,21 +5,18 @@ require "./commands/*"
 # - building instance of every command just to parse the opts
 
 version = "0.1.0"
-active_cmd = nil
+
+commands = [
+  LsCommand.new,
+  HeadCommand.new,
+]
 
 opt_parser = OptionParser.new do |parser|
   parser.banner = "crystal-busybox"
 
-  commands = [
-    LsCommand.new,
-    HeadCommand.new,
-  ]
 
   commands.each do |cmd|
-    active = cmd.setup_parser(parser)
-    if active
-      active_cmd = cmd
-    end
+    cmd.setup_parser(parser)
   end
 
   parser.on "-v", "--version", "Show version" do
@@ -35,6 +32,8 @@ end
 
 opt_parser.parse
 
-if active_cmd
-  active_cmd.run
+commands.each do |cmd|
+  if cmd.active
+    cmd.run
+  end
 end
